@@ -32,14 +32,23 @@ let
  *  
  *
     * @apiParam    (Body)  {Oid}    userId     - userId
+ *
     * @apiSuccess  {String}    token     - token
+ *  @apiSuccess {Object} user - User data
  *  
  *
  * @apiSuccessExample Body
  *
-    {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJJZCI6InNvbWVVc2VySWQifSwiaWF0IjoxNTU5MjAyMjY3LCJleHAiOjE1NTkyMDU4Njd9.kDeYO6nTuC8B8eZtC6U6IqbHPhrxY-G59U8jVesywCA",
-    }
+ {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJJZCI6IjVjZWU3MzBiYjI4MjBkNDc1ODJlOWFiZSJ9LCJpYXQiOjE1NzE1Njc5NzQsImV4cCI6MTU3Njc1MTk3NH0.2gH-eHgcpz7XYSIEKqjr5n2IxB377z-uGUVvyVT85dc",
+    "user": {
+         "_id": "5dac3966e045e048c247a661",
+         "userId": "5cee730bb2820d47582e9abe",
+         "firstModified": "2019-10-20T10:39:34.662Z",
+         "lastModified": "2019-10-20T10:39:34.662Z",
+         "__v": 0
+        }
+   }
  *  
  *
  * @apiSampleRequest http://localhost:3333/auth/token/create

@@ -68,11 +68,11 @@ exports.create          = function (req, res, next) {
                         res.status(500);
                         res.json(errMsg);
                     }else if(data){
-                        callback(null);
+                        callback(null, data);
                     }
                 });
             }else{
-                callback(null);
+                callback(null, data);
             }
         });
 
@@ -81,9 +81,9 @@ exports.create          = function (req, res, next) {
     /**
      * @name                - Create data
      * @description         - Creates token data
-     * @param callback      - Callback function (error)
+     * @param callback      - Callback function (userData, error)
      */
-    function createData (callback) {
+    function createData (userData, callback) {
         debug('Create data init...');
 
         jwt.sign({
@@ -97,7 +97,8 @@ exports.create          = function (req, res, next) {
             }else if(token){
                 res.status(201);
                 res.json({
-                    token : token
+                    token : token,
+                    user : userData
                 });
             }
             callback(null);

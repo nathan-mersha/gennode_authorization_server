@@ -4829,13 +4829,20 @@
             "optional": false,
             "field": "token",
             "description": "<ul> <li>token</li> </ul>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<ul> <li>User data</li> </ul>"
           }
         ]
       },
       "examples": [
         {
           "title": "Body",
-          "content": "\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJJZCI6InNvbWVVc2VySWQifSwiaWF0IjoxNTU5MjAyMjY3LCJleHAiOjE1NTkyMDU4Njd9.kDeYO6nTuC8B8eZtC6U6IqbHPhrxY-G59U8jVesywCA\",\n}",
+          "content": "\n{\n   \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJJZCI6IjVjZWU3MzBiYjI4MjBkNDc1ODJlOWFiZSJ9LCJpYXQiOjE1NzE1Njc5NzQsImV4cCI6MTU3Njc1MTk3NH0.2gH-eHgcpz7XYSIEKqjr5n2IxB377z-uGUVvyVT85dc\",\n   \"user\": {\n        \"_id\": \"5dac3966e045e048c247a661\",\n        \"userId\": \"5cee730bb2820d47582e9abe\",\n        \"firstModified\": \"2019-10-20T10:39:34.662Z\",\n        \"lastModified\": \"2019-10-20T10:39:34.662Z\",\n        \"__v\": 0\n       }\n  }",
           "type": "json"
         }
       ]
