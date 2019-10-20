@@ -1,0 +1,37 @@
+version: '2'
+services:
+
+  #################################################################################################################################
+  ########################                     hisab_authorization_service              #####################################################
+  #################################################################################################################################
+
+    hisab_authorization_service:
+      build: ./.
+      ports:
+        - "3333:3333"
+      restart: always
+      environment:
+        - HTTP_PORT=3333
+        - MONGODB_URL=mongodb://localhost:27017/auth
+        - MONGODB_URL_TEST=mongodb://localhost:27017/auth_test
+        - COLLECTION_RETURN_SIZE=12
+        - REVERSE_PROXY=http://localhost
+        - ELASTIC_SEARCH_URL=http://localhost:9200
+        - LOG_STASH_PORT=5000
+        - DEBUG=*
+        - TOKEN_EXPIRATION_TIME=60d
+        - SECRET=changeMeNow
+        - SALT_LENGTH=8
+        - USER_NAME=gennode
+        - PASSWORD=changeMeNowAndQuick
+      depends_on:
+        - hisab_authorization_service_db
+    # Defining hisab_authorization_service DB
+    hisab_authorization_service_db:
+       image: mongo:latest
+       restart: always
+       volumes:
+         - .:/data/db
+
+  #################################################################################################################################
+  #################################################################################################################################
