@@ -81,9 +81,9 @@ mongoose.connection.on('error',function (err) {
 app.use(helmet());
 
 // TODO : Must remove test condition on production.
-if(process.env.test !== "true"){
-    app.use(authorize);
-}
+// if(process.env.test !== "true"){
+//     app.use(authorize);
+// }
 
 /**
  * @description     - Defining mode and access control
