@@ -123,7 +123,7 @@ exports.login           = function (req, res, next) {
      */
     function validateUserNamePassword(callback) {
         let query = {userName : body.userName};
-        adminDAL.comparePassword(query, body.password, function (error, isValid) {
+        adminDAL.comparePassword(query, body.password, function (error, isValid, adminData) {
             if(error){
                 let errMsg = errorCodes.AUT.UNAUTHORIZED_ACCESS;
                 errMsg.detail = error;
@@ -135,7 +135,7 @@ exports.login           = function (req, res, next) {
                 res.status(401);
                 res.json(errMsg);
             }else if (isValid){
-                callback(null);
+                callback(null, adminData);
             }
         });
     }
@@ -143,9 +143,10 @@ exports.login           = function (req, res, next) {
     /**
      * @name            - Generate token
      * @description     - Generates token for the validated user
+     * @param adminData - Admin data
      * @param callback  - Callback function (error)
      */
-    function generateToken(callback) {
+    function generateToken(adminData, callback) {
         jwt.sign({
             data:{userName : body.userName}
         }, config.SECRET, { expiresIn: config.TOKEN_EXPIRATION_TIME },(err, token)=>{
@@ -155,9 +156,11 @@ exports.login           = function (req, res, next) {
                 res.status(500);
                 res.json(err);
             }else if(token){
+
                 res.status(201);
                 res.json({
-                    token : token
+                    token : token,
+                    admin : adminData
                 });
             }
             callback(null);

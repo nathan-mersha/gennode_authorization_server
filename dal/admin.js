@@ -134,7 +134,7 @@ exports.comparePassword         = function (query, password,callback) {
                 if(err){
                     callback(errorCodes.SEC.SERVER_SIDE_ERROR.errorMessage,null);
                 }else{
-                    callback(null,isValid);
+                    callback(null,isValid,data);
                 }
             });
         }else if(!data){
