@@ -2440,7 +2440,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Body",
-          "content": "\n {\n    \"name\": \"Role A\",\n    \"description\": \"Description for role a\",\n    \"members\": [\n        \"5cee7318b2820d47582e9aca\",\n        \"5cee7318b2820d47582e9acc\",\n        \"5cee7318b2820d47582e9ac3\",\n        \"5cee7318b2820d47582e9ac5\",\n    ],\n    \"accessRoutes\": [\n        { route : \"http://sample/route/1\", method : \"POST\" },\n        { route : \"http://sample/route/2\", method : \"DELETE\" },\n        { route : \"http://sample/route/3\", method : \"GET\" },\n        { route : \"http://sample/route/4\", method : \"PUT\" },\n    ]\n}",
+          "content": "\n {\n    \"name\": \"Role A\",\n    \"description\": \"Description for role a\",\n    \"members\": [\n        \"5cee7318b2820d47582e9aca\",\n        \"5cee7318b2820d47582e9acc\",\n        \"5cee7318b2820d47582e9ac3\",\n        \"5cee7318b2820d47582e9ac5\",\n    ],\n    \"accessRoutes\": [\n        { route : \"http://sample/route/1\", method : \"POST\", name : \"name 1\", group : \"group 1\", description : \"description 1\" },\n        { route : \"http://sample/route/2\", method : \"DELETE\", name : \"name 2\", group : \"group 2\", description : \"description 2\" },\n        { route : \"http://sample/route/3\", method : \"GET\", name : \"name 3\", group : \"group 3\", description : \"description 3\" },\n        { route : \"http://sample/route/4\", method : \"PUT\", name : \"name 4\", group : \"group 4\", description : \"description 4\" }\n    ]\n}",
           "type": "json"
         }
       ],

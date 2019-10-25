@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">75% </span>
+        <span class="strong">70.78% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>108/144</span>
+        <span class='fraction'>109/154</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">53.7% </span>
+        <span class="strong">51.72% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>29/54</span>
+        <span class='fraction'>30/58</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">90.91% </span>
+        <span class="strong">88.24% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>30/33</span>
+        <span class='fraction'>30/34</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">74.83% </span>
+        <span class="strong">70.59% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>107/143</span>
+        <span class='fraction'>108/153</span>
       </div>
     </div>
   </div>
@@ -405,7 +405,27 @@
 360
 361
 362
-363</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -552,6 +572,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -562,8 +583,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -585,6 +608,23 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -892,7 +932,7 @@ exports.login           = function (req, res, next) {
      */
     function validateUserNamePassword(callback) {
         let query = {userName : body.userName};
-        adminDAL.comparePassword(query, body.password, function (error, isValid) {
+        adminDAL.comparePassword(query, body.password, function (error, isValid, adminData) {
             if(error){
                 let errMsg = errorCodes.AUT.UNAUTHORIZED_ACCESS;
                 errMsg.detail = error;
@@ -904,7 +944,7 @@ exports.login           = function (req, res, next) {
 <span class="cstat-no" title="statement not covered" >                res.status(401);</span>
 <span class="cstat-no" title="statement not covered" >                res.json(errMsg);</span>
             }else <span class="missing-if-branch" title="else path not taken" >E</span>if (isValid){
-                callback(null);
+                callback(null, adminData);
             }
         });
     }
@@ -912,9 +952,10 @@ exports.login           = function (req, res, next) {
     /**
      * @name            - Generate token
      * @description     - Generates token for the validated user
+     * @param adminData - Admin data
      * @param callback  - Callback function (error)
      */
-    function generateToken(callback) {
+    function generateToken(adminData, callback) {
         jwt.sign({
             data:{userName : body.userName}
         }, config.SECRET, { expiresIn: config.TOKEN_EXPIRATION_TIME },(err, token)=&gt;{
@@ -924,9 +965,11 @@ exports.login           = function (req, res, next) {
 <span class="cstat-no" title="statement not covered" >                res.status(500);</span>
 <span class="cstat-no" title="statement not covered" >                res.json(err);</span>
             }else <span class="missing-if-branch" title="else path not taken" >E</span>if(token){
+&nbsp;
                 res.status(201);
                 res.json({
-                    token : token
+                    token : token,
+                    admin : adminData
                 });
             }
             callback(null);
@@ -948,7 +991,24 @@ exports.find            = function (req, res, next) {
         }else{
             getPublic(req, res, next);
         }
-    }else{
+    }
+    // BM : begins change (include in module)
+    else <span class="missing-if-branch" title="if path not taken" >I</span>if(req.query.all === "true"){
+<span class="cstat-no" title="statement not covered" >        let query = controllerHelper.queryFilter(req,["email" ,"userName" , "role", "_id", "__v"]);</span>
+<span class="cstat-no" title="statement not covered" >        adminDAL.getAllCollection(query, <span class="fstat-no" title="function not covered" >function (err, data) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if(!err){</span>
+<span class="cstat-no" title="statement not covered" >                res.status(200);</span>
+<span class="cstat-no" title="statement not covered" >                res.json(data);</span>
+            }else{
+<span class="cstat-no" title="statement not covered" >                let errMsg = errorCodes.SEC.SERVER_SIDE_ERROR;</span>
+<span class="cstat-no" title="statement not covered" >                errMsg.detail = err.toString();</span>
+<span class="cstat-no" title="statement not covered" >                res.status(500);</span>
+<span class="cstat-no" title="statement not covered" >                res.json(errMsg);</span>
+            }
+        });
+    }
+    // BM : begins change (include in module)
+    else{
         let option = {
             page     : req.query.page  === undefined ? 1                             : <span class="branch-1 cbranch-no" title="branch not covered" >Number(req.query.page),</span>   // assigns default page value, if not specified.
             sort     : req.query.sort  === undefined ? {_id : -1}                    : <span class="branch-1 cbranch-no" title="branch not covered" >req.query.sort,</span>           // assigns default sort param value, if not specified.
@@ -1135,7 +1195,7 @@ function getPublic  (req, res, next) {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sun Oct 20 2019 13:17:50 GMT+0300 (EAT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Oct 25 2019 16:40:59 GMT+0300 (EAT)
 </div>
 </div>
 <script src="../../prettify.js"></script>

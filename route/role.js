@@ -35,10 +35,10 @@ let
         "5cee7318b2820d47582e9ac5",
     ],
     "accessRoutes": [
-        { route : "http://sample/route/1", method : "POST" },
-        { route : "http://sample/route/2", method : "DELETE" },
-        { route : "http://sample/route/3", method : "GET" },
-        { route : "http://sample/route/4", method : "PUT" },
+        { route : "http://sample/route/1", method : "POST", name : "name 1", group : "group 1", description : "description 1" },
+        { route : "http://sample/route/2", method : "DELETE", name : "name 2", group : "group 2", description : "description 2" },
+        { route : "http://sample/route/3", method : "GET", name : "name 3", group : "group 3", description : "description 3" },
+        { route : "http://sample/route/4", method : "PUT", name : "name 4", group : "group 4", description : "description 4" }
     ]
 }
  *  

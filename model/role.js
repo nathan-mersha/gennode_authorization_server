@@ -24,7 +24,10 @@ let role = new Schema({
     members         : [{type : Schema.Types.ObjectId, ref:'user'}],
     accessRoutes    : [{
         route  : {type : String, es_indexed : true},
-        method : {type : String, enum : constants.METHODS}
+        method : {type : String, enum : constants.METHODS},
+        name   : {type : String},
+        group  : {type : String},
+        description : {type : String}
     }],
     firstModified   : {type : Date, es_indexed : true},
     lastModified    : {type : Date, es_indexed : true}

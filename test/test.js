@@ -121,12 +121,12 @@ function isRole(body, private = false) {
              function isToken(body, private = false) {
                  if(private) {
 // Begin body expected evaluation here for model : token (private)
-    expect(body).to.be.an('object').that.has.all.keys('token');
+    expect(body).to.be.an('object').that.has.all.keys('token', 'user');
     expect(body.token).to.be.a('String');
 // End body expected evaluation here for model : token (private)
                  }else{
 // Begin body expected evaluation here for model : token (public)
-    expect(body).to.be.an('object').that.has.all.keys('token');
+    expect(body).to.be.an('object').that.has.all.keys('token', 'user');
     expect(body.token).to.be.a('String');
 // End body expected evaluation here for model : token (public)
                  }

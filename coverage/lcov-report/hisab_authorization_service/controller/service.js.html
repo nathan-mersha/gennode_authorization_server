@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">87.05% </span>
+        <span class="strong">81.88% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>121/139</span>
+        <span class='fraction'>122/149</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">69.35% </span>
+        <span class="strong">66.67% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>43/62</span>
+        <span class='fraction'>44/66</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">96.67% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>29/29</span>
+        <span class='fraction'>29/30</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">86.96% </span>
+        <span class="strong">81.76% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>120/138</span>
+        <span class='fraction'>121/148</span>
       </div>
     </div>
   </div>
@@ -382,7 +382,25 @@
 337
 338
 339
-340</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -472,6 +490,24 @@
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -812,7 +848,25 @@ exports.find            = function (req, res, next) {
         }else{
             getPublic(req, res, next);
         }
-    }else{
+    }
+    // BM : begins change (include in module)
+    else <span class="missing-if-branch" title="if path not taken" >I</span>if(req.query.all === "true"){
+<span class="cstat-no" title="statement not covered" >        let query = controllerHelper.queryFilter(req,["name","serviceId","routes" , "_id", "__v"]);</span>
+<span class="cstat-no" title="statement not covered" >        serviceDAL.getAllCollection(query, <span class="fstat-no" title="function not covered" >function (err, data) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if(!err){</span>
+<span class="cstat-no" title="statement not covered" >                res.status(200);</span>
+<span class="cstat-no" title="statement not covered" >                res.json(data);</span>
+            }else{
+<span class="cstat-no" title="statement not covered" >                let errMsg = errorCodes.SEC.SERVER_SIDE_ERROR;</span>
+<span class="cstat-no" title="statement not covered" >                errMsg.detail = err.toString();</span>
+<span class="cstat-no" title="statement not covered" >                res.status(500);</span>
+<span class="cstat-no" title="statement not covered" >                res.json(errMsg);</span>
+            }
+        });
+    }
+    // BM : ends change (include in module)
+&nbsp;
+    else{
         let option = {
             page     : req.query.page  === undefined ? 1                             : <span class="branch-1 cbranch-no" title="branch not covered" >Number(req.query.page),</span>   // assigns default page value, if not specified.
             sort     : req.query.sort  === undefined ? {_id : -1}                    : <span class="branch-1 cbranch-no" title="branch not covered" >req.query.sort,</span>           // assigns default sort param value, if not specified.
@@ -1066,7 +1120,7 @@ function getPrivate (req, res, next) {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sun Oct 20 2019 13:17:50 GMT+0300 (EAT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Oct 25 2019 16:40:59 GMT+0300 (EAT)
 </div>
 </div>
 <script src="../../prettify.js"></script>
