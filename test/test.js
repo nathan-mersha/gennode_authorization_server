@@ -2105,7 +2105,12 @@ function isRole(body, private = false) {
                         operation = "push";
 
                     let query = `schemaName=${dummyData.acm.create.successByObject.schemaName}&target=${target}&operation=${operation}`;
+
+                    console.log("Request url : ", url.schema.update(query));
+                    console.log("Request body : ", [roleData.name]);
                     sendRequest(url.schema.update(query),'put',[roleData.name],200,function (err, res) {
+                        console.log("Schema push response : ", JSON.stringify(res.body));
+
                         let body = res.body;
                         expect(err).to.be.null;
                         isSchema(body, false);

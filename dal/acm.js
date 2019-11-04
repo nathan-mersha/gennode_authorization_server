@@ -133,6 +133,7 @@ exports.pushToArray             = function (query, targetedArray,elements,callba
                 if(targetArray !== null){
                     let filteredElements = _.without(elements, ...targetArray);
                     targetArray.push(...filteredElements);
+                    targetArray.pull(null);
                     data.markModified(targetedArray);
                     data.save();
                     callback(err,data);
@@ -163,6 +164,7 @@ exports.pullFromArray             = function (query, targetedArray,elements,call
             if(targetArray !== undefined){
                 helper.removeChildFromParent(targetArray, elements);
                 data.markModified(targetedArray);
+                targetArray.pull(null);
                 data.save();
                 callback(err,data);
             }else{
@@ -173,3 +175,89 @@ exports.pullFromArray             = function (query, targetedArray,elements,call
         }
     });
 };
+
+
+// subjects = Admin 1, Admin 2
+// document Ids = ["23456789345678", "123456789345678"]
+
+// {
+//     "documentIds" : ["2345678"
+//     "accessControl":{
+//     "read":[ "Role M", "Role K"],
+//         "update":["Role N"],
+//         "delete":["Role N"]
+// }
+// }
+
+
+
+// Update data
+
+// [
+//     {
+//         subject : "Admin 1",
+//         accessControl : {
+//             read : ["a","b"],
+//             update : [],
+//             delete : ["a", "b"]
+//         }
+//     },
+//
+//     {
+//         subject : "Admin 2",
+//         accessControl : {
+//             read : ["a","b"],
+//             update : [],
+//             delete : ["a", "b"]
+//         }
+//     }
+// ]
+exports.pushPullToArrayMultiple     = function (updatedDatas, operation, callback) {
+    let success = [];
+    let errors = [];
+    let counter = 0;
+
+    updatedDatas.forEach(function (updateData) {
+        let query = {subject : updateData.subject};
+        Model.findOne(query,function (err, data) {
+            if(!err && data !== null){
+                // console.log("data accessControl : \n", data.accessControl);
+                let methods = Object.keys(data.accessControl);
+
+                methods.forEach(function (method) {
+                    if(method !== "$init"){
+                        let accessControlValues = data.accessControl[method];
+                        if(operation === "push"){
+                            // todo : evaluate filted elemenst value.
+                            let filteredElements = _.without(...updateData.accessControl[method], data.accessControl[method]);
+                            console.log("begin ----")
+                            console.log("updated data : \n", updateData);
+                            console.log("init data : \n", data.accessControl[method]);
+                            // console.log("filterd elements : \n", filteredElements);
+                            console.log("end -----")
+                            accessControlValues.push(filteredElements);
+                            // console.log("Pushing filtered array : \n",filteredElements);
+                        }else if(operation === "pull"){
+                            accessControlValues.pull(...data.accessControl[method]);
+                        }
+                        accessControlValues.pull(null);
+                    }
+
+                });
+
+
+                data.save();
+                success.push(data);
+                counter++;
+                if(counter === updatedDatas.length){callback(null, {success : success, errors : errors});}
+            }else{
+                errors.push(err);
+                counter++;
+                if(counter === updatedDatas.length){callback(null, {success : success, errors : errors});}
+            }
+        });
+
+    })
+
+};
+

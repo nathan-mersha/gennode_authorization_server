@@ -126,12 +126,14 @@ exports.removeMany              = function removeMany(query,callback)           
  * @param callback      - Callback function (error, data)
  */
 exports.pushToArray             = function (query, targetedArray,elements,callback) {
+
     Model.findOne(query,function (err, data) {
         if(!err){
             let targetArray = helper.resolveObjTarget(targetedArray, data);
             if(targetArray !== undefined){
                 let filteredElements = _.without(elements, ...targetArray);
                 targetArray.push(...filteredElements);
+                targetArray.pull(null);
                 data.markModified(targetedArray);
                 data.save();
                 callback(err,data);
@@ -143,6 +145,54 @@ exports.pushToArray             = function (query, targetedArray,elements,callba
         }
     });
 };
+
+exports.pushToArrayMultiple     = function (query, updatedDatas, callback) {
+    Model.findOne(query,function (err, data) {
+        if(!err){
+
+            // accessControl.read
+            let methods = Object.keys(updatedDatas);
+            methods.forEach(function (method) {
+                let targetedArray = `accessControl.${method}`;
+                let targetArray = helper.resolveObjTarget(targetedArray, data);
+
+                if(targetArray !== undefined){
+                    let filteredElements = _.without(updatedDatas[method], ...targetArray);
+                    targetArray.push(...filteredElements);
+                    targetArray.pull(null);
+                }
+            });
+            data.save();
+            callback(null, data);
+        }else{
+            callback(err, null);
+        }
+    });
+};
+
+exports.pullFromArrayMultiple     = function (query, updatedDatas, callback) {
+    Model.findOne(query,function (err, data) {
+        if(!err){
+            // accessControl.read
+            let methods = Object.keys(updatedDatas);
+            methods.forEach(function (method) {
+                let targetedArray = `accessControl.${method}`;
+                let targetArray = helper.resolveObjTarget(targetedArray, data);
+
+                if(targetArray !== undefined){
+                    helper.removeChildFromParent(targetArray, updatedDatas[method]);
+                    targetArray.pull(null);
+                    data.markModified(targetedArray);
+                }
+            });
+            data.save();
+            callback(null, data);
+        }else{
+            callback(err, null);
+        }
+    });
+};
+
 
 /**
  * @name                - Pull from array
@@ -158,6 +208,7 @@ exports.pullFromArray             = function (query, targetedArray,elements,call
             let targetArray = helper.resolveObjTarget(targetedArray, data);
             if(targetArray !== undefined){
                 helper.removeChildFromParent(targetArray, elements);
+                targetArray.pull(null);
                 data.markModified(targetedArray);
                 data.save();
                 callback(err,data);

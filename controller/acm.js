@@ -30,6 +30,8 @@ let
 exports.create          = function (req, res, next) {
     debug('Create init...');
 
+    debug('here.. create');
+    debug("Create by : ", req.query.createBy);
     let body     = req.body,
         createBy = req.query.createBy;
 

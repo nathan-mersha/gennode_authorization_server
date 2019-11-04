@@ -17,9 +17,9 @@ let
 
 let acm = new Schema({
     // Schema definition begins here
-    subject         : {type:String,es_indexed:true, required : true}, // User id, any
+    subject         : {type:String,es_indexed:true, required : true}, // Admin 1, Admin 2
     accessControl   : {
-        read    : [{type : String, es_indexed : true}],
+        read    : [{type : String, es_indexed : true}], // schema ids
         update  : [{type : String, es_indexed : true}],
         delete  : [{type : String, es_indexed : true}]
     },

@@ -101,7 +101,8 @@ exports.update          = function (req, res, next) {
         query = controllerHelper.queryFilter(req,["schemaName", "serviceName", "_id"]); // data query
 
     let operation = req.query.operation, // Defines operation on the array, pull or push
-        target = req.query.target; // Defines target operation ex (accessControl.read)
+        target = req.query.target, // Defines target operation ex (accessControl.read)
+        multiple = req.query.multiple;
 
 
     async.waterfall([
@@ -109,6 +110,11 @@ exports.update          = function (req, res, next) {
         updateSchema
     ]);
 
+    /**
+     * @name                    - Check schema existence
+     * @description             - Checks schema existence before performing operation.
+     * @param callback          - Callback function (error)
+     */
     function checkSchemaExistence(callback) {
         schemaDAL.getPrivate(query, function (err, data) {
             if(!data){
@@ -122,58 +128,119 @@ exports.update          = function (req, res, next) {
         })
     }
 
+    /**
+     * @name                    - Update Schema
+     * @description             - Updates schema and updates acm
+     */
     function updateSchema() {
-        if(operation !== undefined && target !== undefined){ // Operation method is an array.
-            if(Array.isArray(body)){
-                filterExistingRoles(body, function (filteredRoles) {
-                    if(filteredRoles.length === 0){
-                        let errMsg = errorCodes.SEC.NO_DATA_FOUND;
-                        errMsg.detail = `No existing roles found from body : ${JSON.stringify(body)}`;
-                        res.status(400);
-                        res.json(errMsg);
-                    }else{
-                        if(operation === "pull"){
-                            schemaDAL.pullFromArray(query, target, body, function (err, data) {
-                                if(!err){
-                                    updateACM(operation, target, body, data.documentIds, function () {
+        if( (operation !== undefined && target !== undefined) || (operation !== undefined && multiple === "true")){ // Operation method is an array.
+            if(Array.isArray(body) || multiple === "true"){
+
+
+
+
+
+                if(req.query.multiple === "true"){
+                    if(body.accessControl){ // Access control key exists
+                        if(operation === "push"){
+                            schemaDAL.pushToArrayMultiple(query, body.accessControl, function (err, data) {
+                                schemaToAcm(data, function (error, acms) {
+                                    updateMultipleACM(acms, operation, function (err, response) {
+                                        res.status(200);
+                                        res.json(response);
+                                    });
+                                });
+
+                            });
+                        }else if(operation === "pull"){
+                            schemaDAL.pullFromArrayMultiple(query, body.accessControl, function (err, data) {
+                                schemaToAcm(data, function (error, acms) {
+                                    updateMultipleACM(acms, operation, function (err,response) {
                                         res.status(200);
                                         res.json(data);
                                     });
-                                }else{
-                                    let errMsg = err.includes("Target array") ? errorCodes.SEC.NO_DATA_FOUND : errorCodes.SEC.SERVER_SIDE_ERROR;
-                                    errMsg.detail = err;
-                                    res.status(err.includes("Target array") ? 400 : 500);
-                                    res.json(errMsg);
-                                }
-                            });
-                        }else if(operation === "push"){
+                                });
 
-                            schemaDAL.pushToArray(query, target, body, function (err, data) {
-                                if(!err){
-                                    updateACM(operation, target, body, data.documentIds, function () {
-                                        res.status(200);
-                                        res.json(data);
-                                    })
-                                }else{
-                                    let errMsg = err.includes("Target array") ? errorCodes.SEC.NO_DATA_FOUND : errorCodes.SEC.SERVER_SIDE_ERROR;
-                                    errMsg.detail = err;
-                                    res.status(err.includes("Target array") ? 400 : 500);
-                                    res.json(errMsg);
-                                }
+
                             });
-                        }else{
-                            let errMsg = errorCodes.SEC.VALIDATION_ERROR;
-                            errMsg.detail = `For array manipulation operations method : ${operation} is not valid. Operation must be pull or push.`;
+                        }
+
+
+
+                    }else {
+                        let errMsg = errorCodes.SEC.NO_DATA_FOUND;
+                        errMsg.detail = "Body must have a key accessControl";
+                        res.status(400);
+                        res.json(errMsg);
+                    }
+                }else{
+                    filterExistingRoles(body, function (filteredRoles) {
+                        if(filteredRoles.length === 0){
+                            let errMsg = errorCodes.SEC.NO_DATA_FOUND;
+                            errMsg.detail = `No existing roles found from body : ${JSON.stringify(body)}, Role might be deleted or not created.`;
                             res.status(400);
                             res.json(errMsg);
+                        }else{
+
+                            if(operation === "pull"){
+                                schemaDAL.pullFromArray(query, target, body, function (err, data) {
+                                    if(!err){
+                                        updateACM(operation, target, body, data.documentIds, function () {
+                                            res.status(200);
+                                            res.json(data);
+                                        });
+                                    }else{
+                                        let errMsg = err.includes("Target array") ? errorCodes.SEC.NO_DATA_FOUND : errorCodes.SEC.SERVER_SIDE_ERROR;
+                                        errMsg.detail = err;
+                                        res.status(err.includes("Target array") ? 400 : 500);
+                                        res.json(errMsg);
+                                    }
+                                });
+                            }else if(operation === "push"){
+                                schemaDAL.pushToArray(query, target, body, function (err, data) {
+                                    if(!err){
+                                        updateACM(operation, target, body, data.documentIds, function () {
+                                            res.status(200);
+                                            res.json(data);
+                                        })
+                                    }else{
+                                        let errMsg = err.includes("Target array") ? errorCodes.SEC.NO_DATA_FOUND : errorCodes.SEC.SERVER_SIDE_ERROR;
+                                        errMsg.detail = err;
+                                        res.status(err.includes("Target array") ? 400 : 500);
+                                        res.json(errMsg);
+                                    }
+                                });
+                            }else{
+                                let errMsg = errorCodes.SEC.VALIDATION_ERROR;
+                                errMsg.detail = `For array manipulation operations method : ${operation} is not valid. Operation must be pull or push.`;
+                                res.status(400);
+                                res.json(errMsg);
+                            }
                         }
-                    }
-                });
-            }else{
-                let errMsg = errorCodes.SEC.VALIDATION_ERROR;
-                errMsg.detail = `On array manipulation the body must be an array. ${typeof body} is not allowed.`;
-                res.status(400);
-                res.json(errMsg);
+                    });
+                }
+
+
+
+
+
+
+
+
+
+
+
+            }
+            else{
+                if(multiple === undefined){
+                    let errMsg = errorCodes.SEC.VALIDATION_ERROR;
+                    errMsg.detail = `On array manipulation the body must be an array. ${typeof body} is not allowed.`;
+                    res.status(400);
+                    res.json(errMsg);
+                }else{
+                    let errMsg = errorCodes.SEC.VALIDATION_ERROR;
+                    errMsg.detail = "Either body must be a type of array or query value, multiple must be true, view doc for example.";
+                }
             }
         }
         else{
@@ -184,14 +251,12 @@ exports.update          = function (req, res, next) {
         }
     }
 
-
-
     /**
      * @name                    - Update acm
      * @description             - Updates acm data after schema pull push
      * @param operation         - Operation (pull, push)
      * @param targetArray       - Target array to perform operation (ex : accessControl.read)
-     * @param elements          - Elements
+     * @param elements          - Elements ( Roles to pull or push)
      * @param documentIds       - Documents to pull out or push to
      * @param callback          - Callback function (error, updatedACMs)
      */
@@ -213,6 +278,7 @@ exports.update          = function (req, res, next) {
             elements.forEach(function (element) {
                 let query = {subject : element};
                 acmDAL.pullFromArray(query, targetArray, documentIds, function (err, data) {
+
                     if(!err){updatedACMs.push(data);}
                     counter++;
                     if(counter === elements.length){callback(null, updatedACMs);}
@@ -349,4 +415,68 @@ function filterExistingRoles(roles, callback) {
             if(counter === roles.length){callback(filteredRoles);}
         })
     })
+}
+
+function schemaToAcm(schemaInput, cb) {
+    let createdRoles = [];
+    let acms = [];
+    async.waterfall([
+        createACMScaffold,
+        populateACM,
+    ],function () {
+        cb(null, acms);
+    });
+
+    function createACMScaffold(callback) {
+        let index = 0;
+        let accessControlKeys = Object.keys(schemaInput.accessControl);
+        accessControlKeys.forEach(function (accessControlKey) {
+            index++;
+            if(accessControlKey !== "$init"){
+                schemaInput.accessControl[accessControlKey].forEach(function (role) {
+                    let acmScaffold = {
+                        subject : "",
+                        accessControl : {
+                            read : [],
+                            update : [],
+                            delete : []
+                        }
+                    };
+                    let cloned = Object.assign({}, acmScaffold);
+                    if(!createdRoles.includes(role)){
+                        cloned.subject = role;
+                        acms.push(cloned);
+                        createdRoles.push(role);
+                    }
+                });
+                if(index === accessControlKeys.length){
+                    callback(null);
+                }
+            }
+
+
+
+        });
+    }
+
+    function populateACM(callback) {
+        let accessControlKeys = Object.keys(schemaInput.accessControl);
+        accessControlKeys.forEach(function (methods) {
+            if(methods !== "$init"){
+                let accessControlMethod  = schemaInput.accessControl[methods];
+                accessControlMethod.forEach(function (acmRole) {
+                    acms.forEach(function (acm) {
+                        if(acm.subject === acmRole){
+                            acm.accessControl[methods].push(schemaInput.documentIds)
+                        }
+                    });
+                })
+            }
+        });
+        callback(null);
+    }
+}
+
+function updateMultipleACM(schemaInput, operation, callback) {
+    acmDAL.pushPullToArrayMultiple(schemaInput, operation, callback);
 }
