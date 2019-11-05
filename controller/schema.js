@@ -143,21 +143,21 @@ exports.update          = function (req, res, next) {
                 if(req.query.multiple === "true"){
                     if(body.accessControl){ // Access control key exists
                         if(operation === "push"){
-                            schemaDAL.pushToArrayMultiple(query, body.accessControl, function (err, data) {
-                                schemaToAcm(data, function (error, acms) {
+                            schemaDAL.pushToArrayMultiple(query, body.accessControl, function (err, schemaResponse) {
+                                schemaToAcm(schemaResponse, function (error, acms) {
                                     updateMultipleACM(acms, operation, function (err, response) {
                                         res.status(200);
-                                        res.json(response);
+                                        res.json(schemaResponse);
                                     });
                                 });
 
                             });
                         }else if(operation === "pull"){
-                            schemaDAL.pullFromArrayMultiple(query, body.accessControl, function (err, data) {
-                                schemaToAcm(data, function (error, acms) {
+                            schemaDAL.pullFromArrayMultiple(query, body.accessControl, function (err, schemaResponse) {
+                                schemaToAcm(schemaResponse, function (error, acms) {
                                     updateMultipleACM(acms, operation, function (err,response) {
                                         res.status(200);
-                                        res.json(data);
+                                        res.json(schemaResponse);
                                     });
                                 });
 

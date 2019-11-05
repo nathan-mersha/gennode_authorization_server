@@ -186,7 +186,20 @@ exports.pullFromArrayMultiple     = function (query, updatedDatas, callback) {
                 }
             });
             data.save();
-            callback(null, data);
+
+            let updateData = {
+                accessControl : {
+                    read : data.accessControl.read,
+                    update : data.accessControl.update,
+                    delete : data.accessControl.delete
+                }
+            };
+
+            Model.findOneAndUpdate(query, updateData, function (err, updatedData) {
+                callback(null, data);
+
+            } )
+
         }else{
             callback(err, null);
         }
