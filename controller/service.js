@@ -86,11 +86,37 @@ exports.find            = function (req, res, next) {
     debug('Find init.');
 
     if(req.query._id !== undefined) {
-        if(req.query.private === undefined) {
-            getPrivate(req, res, next);
-        }else{
-            getPublic(req, res, next);
-        }
+
+        let serviceId = req.query._id,
+            query = {_id: serviceId}; // query construction.
+
+        serviceDAL.getPrivate(query,function (err,data) { // retrieve service public data (with out the value)
+            queryResponseHandler(err,data,res,function (err, data) { // Error handled.
+                if(!data){ // No service value could be found
+                    res.status(404);
+                    res.json(errorCodes.SEC.NO_DATA_FOUND);
+                }else if(data){ // Found service data
+
+                    let serviceRoutes = data.routes;
+                    let routeIndex = 0;
+                    serviceRoutes.forEach(function (serviceRoute) {
+                        let query = {accessRoutes : serviceRoute};
+
+                        roleDAL.getAllCollection(query, function (err, roleData) {
+                            if(roleData.length > 0){
+                                serviceRoute.roles.push(roleData);
+                            }
+                            routeIndex++;
+                            if(routeIndex === serviceRoutes.length){
+                                res.status(200);
+                                res.json(data);
+                            }
+                        })
+                    })
+                }
+            });
+        });
+
     }
     // BM : begins change (include in module)
     else if(req.query.all === "true"){
@@ -354,57 +380,3 @@ exports.count           = function (req, res, next) {
 };
 
 
-/**
- *
- * @name                - Find public
- * @description         - Find service data by id visible only fields that are public.
- * @param req           - Request object
- * @param res           - Response object
- * @param next          - Next
- */
-function getPublic  (req, res, next) {
-    debug('Find public init...');
-
-    let
-        serviceId   = req.query._id,
-        query       = {_id: serviceId}; // query construction.
-
-    serviceDAL.getPublic(query,function (err,data) { // retrieve service public data (with out the value)
-        queryResponseHandler(err,data,res,function (err, data) { // Error handled.
-            if(!data){ // No service value could be found
-                res.status(404);
-                res.json(errorCodes.SEC.NO_DATA_FOUND);
-            }else if(data){ // Found service data
-                res.status(200);
-                res.send(data);
-            }
-        });
-    });
-}
-
-/**
- * @name                - Find private
- * @description         - Find service data by id visible only fields that are private.
- * @param req           - Request object
- * @param res           - Response object
- * @param next          - Next
- */
-function getPrivate (req, res, next) {
-    debug('Find private init...');
-
-    let
-        serviceId = req.query._id,
-        query = {_id: serviceId}; // query construction.
-
-    serviceDAL.getPrivate(query,function (err,data) { // retrieve service public data (with out the value)
-        queryResponseHandler(err,data,res,function (err, data) { // Error handled.
-            if(!data){ // No service value could be found
-                res.status(404);
-                res.json(errorCodes.SEC.NO_DATA_FOUND);
-            }else if(data){ // Found service data
-                res.status(200);
-                res.send(data);
-            }
-        });
-    });
-}
