@@ -9,6 +9,7 @@
 
 let
     Model   = require('../model/role'),
+    _       = require('underscore'),
     helper  = require('../lib/helper').controllerHelper;
 
 
@@ -158,8 +159,11 @@ exports.pullFromArray             = function (query, targetedArray,elements,call
         if(!err){
             let targetArray = helper.resolveObjTarget(targetedArray, data);
             if(targetArray !== undefined){
-                helper.removeChildFromParent(targetArray, elements);
-                data.markModified(targetedArray);
+                let filteredArray = targetArray.filter(function (item) {
+                    return !elements.includes(item._id.toString());
+                });
+                data.accessRoutes = filteredArray;
+                data.markModified("accessRoutes");
                 data.save();
                 callback(err,data);
             }else{

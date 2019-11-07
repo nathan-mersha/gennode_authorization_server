@@ -230,11 +230,6 @@ exports.pushPullToArrayMultiple     = function (updatedDatas, operation, callbac
                         if(operation === "push"){
                             // todo : evaluate filted elemenst value.
                             let filteredElements = _.without(...updateData.accessControl[method], data.accessControl[method]);
-                            console.log("begin ----")
-                            console.log("updated data : \n", updateData);
-                            console.log("init data : \n", data.accessControl[method]);
-                            // console.log("filterd elements : \n", filteredElements);
-                            console.log("end -----")
                             accessControlValues.push(filteredElements);
                             // console.log("Pushing filtered array : \n",filteredElements);
                         }else if(operation === "pull"){
