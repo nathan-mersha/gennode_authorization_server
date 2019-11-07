@@ -9,11 +9,13 @@
 
 let
     serviceDAL              = require('../dal/service'),
+    roleDAL                = require('../dal/role'),
     constants               = require('../lib/constant'),
     errorCodes              = constants.errorCodes,
     config                  = require('../config'),
     helper                  = require('../lib/helper/'),
     controllerHelper        = helper.controllerHelper,
+
     queryResponseHandler    = controllerHelper.queryResponseHandler,
     debug                   = require('debug')('hisab_authorization_service/controller/service'),
     async                   = require('async');
@@ -94,15 +96,40 @@ exports.find            = function (req, res, next) {
     else if(req.query.all === "true"){
         let query = controllerHelper.queryFilter(req,["name","serviceId","routes" , "_id", "__v"]);
         serviceDAL.getAllCollection(query, function (err, data) {
-            if(!err){
-                res.status(200);
-                res.json(data);
-            }else{
-                let errMsg = errorCodes.SEC.SERVER_SIDE_ERROR;
-                errMsg.detail = err.toString();
-                res.status(500);
-                res.json(errMsg);
-            }
+
+
+            let index = 0;
+            data.forEach(function (doc) {
+                let serviceRoutes = doc.routes;
+                let routeIndex = 0;
+                serviceRoutes.forEach(function (serviceRoute) {
+                    let query = {accessRoutes : serviceRoute};
+
+                    roleDAL.getAllCollection(query, function (err, roleData) {
+                        if(roleData.length > 0){
+                            serviceRoute.roles.push(roleData);
+                        }
+                        routeIndex++;
+                        if(routeIndex === serviceRoutes.length){
+                            index++;
+                            if(index === data.length){
+                                if(!err){
+                                    res.status(200);
+                                    res.json(data);
+                                }else{
+                                    let errMsg = errorCodes.SEC.SERVER_SIDE_ERROR;
+                                    errMsg.detail = err.toString();
+                                    res.status(500);
+                                    res.json(errMsg);
+                                }
+                            }
+                        }
+                    })
+                })
+            });
+
+
+
         });
     }
     // BM : ends change (include in module)
@@ -121,10 +148,35 @@ exports.find            = function (req, res, next) {
         serviceDAL.getCollectionsPaginated(query,option,function (err,data) {
             queryResponseHandler(err,data,res,function (err, data) { // Possible errors are handled.
                 if(data){ // Data found.
-                    debug("Found data");
+                    let index = 0;
+                    data.docs.forEach(function (doc) {
+                        let serviceRoutes = doc.routes;
+                        let routeIndex = 0;
+                        serviceRoutes.forEach(function (serviceRoute) {
+                            let query = {accessRoutes : serviceRoute};
 
-                    res.status(200);
-                    res.json(data);
+                            roleDAL.getAllCollection(query, function (err, roleData) {
+                                if(roleData.length > 0){
+                                    serviceRoute.roles.push(roleData);
+                                }
+                                routeIndex++;
+                                if(routeIndex === serviceRoutes.length){
+                                    index++;
+                                    if(index === data.docs.length){
+                                        if(!err){
+                                            res.status(200);
+                                            res.json(data);
+                                        }else{
+                                            let errMsg = errorCodes.SEC.SERVER_SIDE_ERROR;
+                                            errMsg.detail = err.toString();
+                                            res.status(500);
+                                            res.json(errMsg);
+                                        }
+                                    }
+                                }
+                            })
+                        })
+                    });
                 }else if(!data){ // No data found.
                     debug(`Found no data`);
 

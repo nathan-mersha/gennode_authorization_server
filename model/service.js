@@ -25,7 +25,8 @@ let service = new Schema({
         route       : {type : String, es_indexed : true, required : true},
         group       : {type : String, es_indexed : true},
         name        : {type : String, es_indexed : true},
-        description : {type : String, es_indexed : true}
+        description : {type : String, es_indexed : true},
+        roles       : []
     }],
     firstModified   : {type : Date, es_indexed : true},
     lastModified    : {type : Date, es_indexed : true}
