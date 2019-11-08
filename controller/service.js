@@ -100,7 +100,7 @@ exports.find            = function (req, res, next) {
                     let serviceRoutes = data.routes;
                     let routeIndex = 0;
                     serviceRoutes.forEach(function (serviceRoute) {
-                        let query = {accessRoutes : serviceRoute};
+                        let query = {"accessRoutes._id" : serviceRoute};
 
                         roleDAL.getAllCollection(query, function (err, roleData) {
                             if(roleData.length > 0){
@@ -129,7 +129,7 @@ exports.find            = function (req, res, next) {
                 let serviceRoutes = doc.routes;
                 let routeIndex = 0;
                 serviceRoutes.forEach(function (serviceRoute) {
-                    let query = {accessRoutes : serviceRoute};
+                    let query = {"accessRoutes._id" : serviceRoute};
 
                     roleDAL.getAllCollection(query, function (err, roleData) {
                         if(roleData.length > 0){
@@ -179,7 +179,7 @@ exports.find            = function (req, res, next) {
                         let serviceRoutes = doc.routes;
                         let routeIndex = 0;
                         serviceRoutes.forEach(function (serviceRoute) {
-                            let query = {accessRoutes : serviceRoute};
+                            let query = {"accessRoutes._id" : serviceRoute};
 
                             roleDAL.getAllCollection(query, function (err, roleData) {
                                 if(roleData.length > 0){
