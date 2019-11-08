@@ -185,7 +185,7 @@ exports.find            = function (req, res, next) {
     }
     // BM : begins change (include in module)
     else if(req.query.all === "true"){
-        let query = controllerHelper.queryFilter(req,["email" ,"userName" , "role", "_id", "__v"]);
+        let query = controllerHelper.queryFilter(req,["name", "phone", "email" ,"userName" , "role", "_id", "__v"]);
         adminDAL.getAllCollection(query, function (err, data) {
             if(!err){
                 res.status(200);
@@ -205,10 +205,10 @@ exports.find            = function (req, res, next) {
             sort     : req.query.sort  === undefined ? {_id : -1}                    : req.query.sort,           // assigns default sort param value, if not specified.
             lean     : req.query.lean  === undefined ? false                         : req.query.lean,           // assigns default lean value, if not specified.
             limit    : req.query.limit === undefined ? config.COLLECTION_RETURN_SIZE : Number(req.query.limit),  // assigns default limit value (passed to the config), if not specified.
-            select   : "email userName role firstModified lastModified"
+            select   : "name phone email userName role firstModified lastModified"
         };
 
-        let query = controllerHelper.queryFilter(req,["email" ,"userName" , "role", "_id", "__v"]);
+        let query = controllerHelper.queryFilter(req,["name", "phone", "email" ,"userName" , "role", "_id", "__v"]);
         // get collection paginated invoked
         adminDAL.getCollectionsPaginated(query,option,function (err,data) {
             queryResponseHandler(err,data,res,function (err, data) { // Possible errors are handled.
@@ -234,7 +234,7 @@ exports.find            = function (req, res, next) {
  * @param next          - Next
  */
 exports.update          = function (req, res, next) {
-    let query = controllerHelper.queryFilter(req,["email", "userName", "role", "_id", "__v"]);
+    let query = controllerHelper.queryFilter(req,["name", "phone", "email", "userName", "role", "_id", "__v"]);
     async.waterfall([
         pickUpdateData,
         updateData
@@ -247,7 +247,7 @@ exports.update          = function (req, res, next) {
      * @param callback      - Callback function (error,validUpdateData)
      */
     function pickUpdateData (callback)                  {
-        controllerHelper.pickUpdateData(["email", "userName", "role"],req,function (err,validUpdateData) { // Picking up valid update data.
+        controllerHelper.pickUpdateData(["name", "phone", "email", "userName", "role"],req,function (err,validUpdateData) { // Picking up valid update data.
             if(Object.keys(validUpdateData).length === 0){ // No valid update data found.
                 let errMsg = errorCodes.SEC.IMPROPER_DATA;
                 errMsg.detail = "Valid update data not found.";
@@ -290,7 +290,7 @@ exports.update          = function (req, res, next) {
  * @param next          - Next
  */
 exports.remove          = function (req, res, next) {
-    let query = controllerHelper.queryFilter(req,["email", "userName", "role", "_id", "__v"]);
+    let query = controllerHelper.queryFilter(req,["name", "phone", "email", "userName", "role", "_id", "__v"]);
 
     if(Object.keys(query).length === 0){
         let errMsg = errorCodes.SEC.NO_DATA_FOUND;
@@ -315,7 +315,7 @@ exports.remove          = function (req, res, next) {
  * @param next          - Next
  */
 exports.count           = function (req, res, next) {
-    let query = controllerHelper.queryFilter(req,["email", "userName", "role" , "_id", "__v"]);
+    let query = controllerHelper.queryFilter(req,["name", "phone", "email", "userName", "role" , "_id", "__v"]);
 
     adminDAL.count(query, function (err, count) {
         if(err){

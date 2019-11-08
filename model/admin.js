@@ -17,6 +17,8 @@ let
 
 let admin = new Schema({
     // Schema definition begins here
+    name            : {type : String},
+    phone           : {type : String},
     email           : {type : String},
     userName        : {type : String, required : true, unique : true},
     password        : {type : String, required : true},
