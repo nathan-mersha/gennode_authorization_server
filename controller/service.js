@@ -104,7 +104,7 @@ exports.find            = function (req, res, next) {
 
                         roleDAL.getAllCollection(query, function (err, roleData) {
                             if(roleData.length > 0){
-                                serviceRoute.roles.push(roleData);
+                                serviceRoute.roles = roleData;
                             }
                             routeIndex++;
                             if(routeIndex === serviceRoutes.length){
@@ -133,7 +133,7 @@ exports.find            = function (req, res, next) {
 
                     roleDAL.getAllCollection(query, function (err, roleData) {
                         if(roleData.length > 0){
-                            serviceRoute.roles.push(roleData);
+                            serviceRoute.roles = roleData;
                         }
                         routeIndex++;
                         if(routeIndex === serviceRoutes.length){
@@ -183,7 +183,7 @@ exports.find            = function (req, res, next) {
 
                             roleDAL.getAllCollection(query, function (err, roleData) {
                                 if(roleData.length > 0){
-                                    serviceRoute.roles.push(roleData);
+                                    serviceRoute.roles = roleData;
                                 }
                                 routeIndex++;
                                 if(routeIndex === serviceRoutes.length){
@@ -340,7 +340,7 @@ exports.remove          = function (req, res, next) {
     debug('Remove many init.');
 
     let query = controllerHelper.queryFilter(req,["name","serviceId","routes", "_id", "__v"]);
-
+    
     if(Object.keys(query).length === 0){
         let errMsg = errorCodes.SEC.NO_DATA_FOUND;
         errMsg.detail = "No query data found.";
