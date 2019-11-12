@@ -36,17 +36,19 @@ exports.status          = function (req, res, next) {
  * @param next          - Next
  */
 exports.get = function (req, res, next) {
+    console.log("Here logging");
     let from = Number(req.query.from) || 30; // Should define stat query from x amount of days.
     let to = Number(req.query.to) || 0;
 
     const options = {
-        from: req.query.from || new Date() - (24 * 60 * 60 * 1000 * from),
-        until: req.query.until || new Date() - (24 * 60 * 60 * 1000 * to),
+        from: new Date() - (24 * 60 * 60 * 1000 * from),
+        until: new Date() - (24 * 60 * 60 * 1000 * to),
         limit: req.query.limit || 12,
         start: req.query.start || 0,
         order: req.query.order || 'desc'
     };
 
+    console.log("Query options : ", options);
     logger.query(options, function (err, results) {
         if (err) {
             res.status(500);

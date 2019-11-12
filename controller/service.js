@@ -7,6 +7,7 @@
  * @copyright           Copyright : 2019
  */
 
+ 
 let
     serviceDAL              = require('../dal/service'),
     roleDAL                = require('../dal/role'),
